@@ -33,7 +33,7 @@ Next.js 16.3.0 App Router with TypeScript strict mode and React 19 — the singl
 
 - Depth is the surface ramp (`canvas` → `surface` → `surface-raised`) plus 1px `--line` borders — **no shadows, no gradients**. The hero glow in `components/alpha-glyph.tsx` is the one sanctioned exception.
 - Buttons and pills are `rounded-full`; every interactive element carries `focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand`.
-- The mono font marks machine-ish data (the "coming soon" pill, the teaser list, the repo path).
+- The mono font marks machine-ish data (the "coming soon" pill, the teaser list).
 - Breakpoints `sm:`/`lg:` only. Page container: `mx-auto w-full max-w-6xl px-5`.
 - All motion is CSS-only and lives in `app/globals.css` behind `@media (prefers-reduced-motion: no-preference)`; the base state is the finished, static page — never the other way around.
 - The core message must fit one viewport with no scroll at 390×664. `min-h-dvh` on `<body>` (the deliberate departure from dressme's `h-full`) keeps that true under mobile browser chrome; tiny viewports degrade to scroll rather than clipping.
