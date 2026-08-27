@@ -1,0 +1,167 @@
+@import "tailwindcss";
+
+:root {
+  color-scheme: dark;
+
+  --canvas: #0b0710;
+  --surface: #17101f;
+  --surface-raised: #211729;
+  --line: #2f2338;
+  --ink: #f7f1f6;
+  --ink-muted: #a99cb0;
+  --brand: #ff5fa2;
+  --brand-strong: #ff2d7e;
+  --gold: #ffd166;
+}
+
+@theme inline {
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-line: var(--line);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-brand: var(--brand);
+  --color-brand-strong: var(--brand-strong);
+  --color-gold: var(--gold);
+
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+
+  --radius-card: 1.25rem;
+}
+
+body {
+  background: var(--canvas);
+  color: var(--ink);
+}
+
+/* ——— The hero α and the entrance cascade. Static-first: the base state below
+   is the finished page — glyph drawn, glow lit, text at rest — so reduced
+   motion and a failed stylesheet both land on the final frame. Every
+   animation lives inside the no-preference block.
+
+   The whole block sits in @layer components: the animation shorthands reset
+   animation-delay, and the per-element [animation-delay:…] utilities can only
+   win the cascade from a later layer — unlayered rules would beat them. ——— */
+
+@layer components {
+  .alpha-stroke {
+    stroke-dasharray: 1; /* pathLength="1" on the SVG normalizes dash math */
+    stroke-dashoffset: 0;
+  }
+
+  .alpha-glow-wrap {
+    opacity: 1;
+  }
+
+  /* The blur is rasterized once and cached; only opacity ever animates, which
+     stays on the compositor. Animating the blur radius itself would re-run
+     the filter every frame on the main thread. */
+  .alpha-glow {
+    filter: blur(14px);
+    opacity: 0.6;
+    will-change: opacity;
+  }
+
+  .rise,
+  .fade {
+    opacity: 1;
+  }
+
+  .rise-h1 {
+    transform: none;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    @keyframes alpha-draw {
+      from {
+        stroke-dashoffset: 1;
+      }
+      to {
+        stroke-dashoffset: 0;
+      }
+    }
+
+    @keyframes alpha-glow-in {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes alpha-breathe {
+      0%,
+      100% {
+        opacity: 0.45;
+      }
+      50% {
+        opacity: 0.85;
+      }
+    }
+
+    @keyframes rise {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    @keyframes rise-h1 {
+      from {
+        transform: translateY(6px);
+      }
+      to {
+        transform: none;
+      }
+    }
+
+    @keyframes fade {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    .alpha-stroke {
+      animation: alpha-draw 1.4s cubic-bezier(0.65, 0, 0.35, 1) 0.2s both;
+    }
+
+    /* The glow switches on just as the pen finishes the tail (0.2s + 1.4s),
+       then settles into a resting-breath loop. Fade-in and breathing sit on
+       separate elements so the two opacity animations multiply, not fight. */
+    .alpha-glow-wrap {
+      animation: alpha-glow-in 0.8s ease-out 1.45s both;
+    }
+
+    .alpha-glow {
+      animation: alpha-breathe 4.8s ease-in-out 2.25s infinite both;
+    }
+
+    /* Per-element [animation-delay:…] utilities set the cascade. */
+    .rise {
+      animation: rise 0.5s ease-out both;
+    }
+
+    /* Transform-only: the h1 is the LCP element and must be painted, not
+       faded, from the first frame. */
+    .rise-h1 {
+      animation: rise-h1 0.45s ease-out both;
+    }
+
+    /* Opacity-only, for the footer: it sits on the viewport's bottom edge,
+       where a translateY entrance would transiently overflow the one-screen
+       layout and flash a scrollbar. */
+    .fade {
+      animation: fade 0.5s ease-out both;
+    }
+  }
+}
